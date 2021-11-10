@@ -1,9 +1,16 @@
-import { useRef, useState} from 'react';
+import { useEffect, useRef, useState} from 'react';
 
 const SimpleInput = (props) => {
   const [enteredName, setEnteredName] = useState('');
   const nameInputRef = useRef();
-  const [enteredIsValid, setEnteredIsValid] = useState(true);
+  const [enteredNameIsValid, setEnteredNameIsValid] = useState(false);
+  const [enteredNameTouched, setEnteredNameTouched] = useState(false);
+
+  useEffect(() => {
+    if (enteredNameIsValid) {
+      console.log('Name input is valid');
+    }
+  }, [enteredNameIsValid]);
 
   const nameInputChangeHandler = event => {
     setEnteredName(event.target.value);
@@ -11,9 +18,11 @@ const SimpleInput = (props) => {
 
   const formSubmisiionHandler = event => {
     event.preventDefault();
+
+    setEnteredNameTouched(true);
     
     if (enteredName.trim() === '') {
-      setEnteredIsValid(false);
+      setEnteredNameIsValid(false);
       return;
     }
 
@@ -26,7 +35,9 @@ const SimpleInput = (props) => {
     setEnteredName('');
   };
 
-  const nameInputClasses = enteredIsValid ? 'form-control' : 'form-control invalid';
+  const nameInputIsInvalid = !enteredNameIsValid && enteredNameTouched;
+
+  const nameInputClasses = nameInputIsInvalid ? 'form-control invalid' : 'form-control';
 
   return (
     <form onSubmit={formSubmisiionHandler}>
@@ -34,7 +45,7 @@ const SimpleInput = (props) => {
         <label htmlFor='name'>Your Name</label>
         <input ref={nameInputRef} type='text' id='name' onChange={nameInputChangeHandler} value={enteredName}/>
       </div>
-      {!enteredIsValid && <p className={'error-text'}>Name must not be empty.</p>}
+      {nameInputIsInvalid && <p className={'error-text'}>Name must not be empty.</p>}
       <div className="form-actions">
         <button>Submit</button>
       </div>
